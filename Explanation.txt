@@ -1,0 +1,23 @@
+# Financial Transaction Processor
+
+A PHP-based tool to process financial transactions with VAT adjustments and compound interest calculations.
+
+## Key Features
+- **Transaction Processing**: Handles credits/debits with category-specific VAT (5% for goods/services)
+- **Precision Accounting**: Ensures 2-decimal rounding at every calculation stage
+- **Dynamic UI**: Interactive form for adding/removing transactions
+- **Session Management**: Prevents duplicate form submissions
+
+## Code Style Highlights
+- **Structured Logic**: Separates business logic (`processTransactions`) from presentation
+- **Defensive Checks**: Validates inputs, skips invalid transactions
+- **Explicit Rounding**: Uses `round()` for calculations + `number_format()` for display
+- **Clean OOP-ish Approach**: Functions mimic class methods without over-engineering
+
+## Usage
+1. Run on any PHP-enabled server
+(or to run it local just download XAMPP then put index.php inside folder e.g.,transaction_processor then run it on: http://localhost/transaction_processor/index.php)
+2. Add transactions (amount, type, category)
+3. Set years/rates
+4. View results (net balance, final balance, category breakdown)
+
