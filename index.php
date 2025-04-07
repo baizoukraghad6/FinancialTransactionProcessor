@@ -1,17 +1,6 @@
 <?php
-// Financial Transaction Processor
 
-/**
- * Process financial transactions with VAT and interest calculations
- * 
- * @param array $transactions List of transaction objects
- * @param float $years Time period in years
- * @param float $interestRate Annual interest rate (default 0.05)
- * @param float $vatRate VAT rate (default 0.05)
- * @return array Result with balances and breakdown
- */
 function processTransactions($transactions, $years, $interestRate = 0.05, $vatRate = 0.05) {
-    // Initialize variables
     $netBalance = 0;
     $categoryTotals = [
         'goods' => 0,
@@ -19,28 +8,28 @@ function processTransactions($transactions, $years, $interestRate = 0.05, $vatRa
         'investment' => 0
     ];
     
-    // Process each transaction
+
     foreach ($transactions as $transaction) {
-        // Validate transaction data
+
         if (!isset($transaction['amount']) || !isset($transaction['type']) || !isset($transaction['category'])) {
-            continue; // Skip invalid transactions
+            continue; 
         }
         
         $amount = floatval($transaction['amount']);
         $type = strtolower($transaction['type']);
         $category = strtolower($transaction['category']);
         
-        // Skip transactions with negative amounts
+ 
         if ($amount < 0) {
             continue;
         }
         
-        // Ensure category is valid
+
         if (!in_array($category, array_keys($categoryTotals))) {
-            continue; // Skip invalid categories
+            continue; 
         }
         
-        // Apply VAT for goods and services
+
         $adjustedAmount = $amount;
         if ($category === 'goods' || $category === 'services') {
             if ($type === 'credit') {
@@ -50,7 +39,7 @@ function processTransactions($transactions, $years, $interestRate = 0.05, $vatRa
             }
         }
         
-        // Update net balance
+
         if ($type === 'credit') {
             $netBalance += $adjustedAmount;
             $categoryTotals[$category] += $adjustedAmount;
@@ -60,13 +49,13 @@ function processTransactions($transactions, $years, $interestRate = 0.05, $vatRa
         }
     }
     
-    // Round to 2 decimal places
+
     $netBalance = round($netBalance, 2);
     foreach ($categoryTotals as $category => $total) {
         $categoryTotals[$category] = round($total, 2);
     }
     
-    // Calculate compound interest if balance is positive
+
     $finalBalance = $netBalance;
     if ($netBalance > 0 && $years > 0) {
         $finalBalance = $netBalance * pow(1 + $interestRate, $years);
@@ -80,10 +69,10 @@ function processTransactions($transactions, $years, $interestRate = 0.05, $vatRa
     ];
 }
 
-// Create a session to handle form submission only once
+
 session_start();
 
-// Check if we need to process results
+
 $showResults = false;
 $result = null;
 
@@ -94,7 +83,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $types = $_POST['type'] ?? [];
     $categories = $_POST['category'] ?? [];
     
-    // Combine form data into transactions array
+
     for ($i = 0; $i < count($amounts); $i++) {
         if (isset($amounts[$i]) && isset($types[$i]) && isset($categories[$i])) {
             $transactions[] = [
@@ -108,24 +97,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $years = floatval($_POST['years'] ?? 1);
     $interestRate = floatval($_POST['interestRate'] ?? 0.05);
     $vatRate = floatval($_POST['vatRate'] ?? 0.05);
-    
-    // Process transactions
+
     $result = processTransactions($transactions, $years, $interestRate, $vatRate);
     $showResults = true;
     
-    // Store in session
+
     $_SESSION['result'] = $result;
     $_SESSION['showResults'] = true;
     
-    // Redirect to prevent form resubmission on refresh
+
     header("Location: " . $_SERVER['PHP_SELF']);
     exit;
 } else if (isset($_SESSION['showResults']) && $_SESSION['showResults']) {
-    // Get results from session for display
+
     $result = $_SESSION['result'];
     $showResults = true;
     
-    // Clear the session data for next use
+  
     $_SESSION['showResults'] = false;
     unset($_SESSION['result']);
 }
